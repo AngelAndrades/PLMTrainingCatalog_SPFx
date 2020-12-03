@@ -1,0 +1,132 @@
+/*
+    Download scaffold
+*/
+yo @microsoft/sharepoint --skip-install
+
+
+/*
+    Add jQuery
+*/
+pnpm install --save-dev @types/jquery
+
+//  Edit config.json (conifg folder) - add the following to the externals section
+"jquery": {
+    "path": "https://code.jquery.com/jquery-3.5.1.min.js",
+    "globalName": "jQuery"
+}
+
+//  Add import statement to webpart
+import * as $ from 'jquery';
+
+
+/*
+    Add Kendo UI
+*/
+pnpm install --save-dev @types/kendo-ui
+pnpm install --save @progress/kendo-ui
+
+//  Add import statement to webpart
+import '@progress/kendo-ui';
+
+
+/*
+    NPM Modules Needed
+*/
+pnpm install --save @microsoft/sp-loader
+pnpm install @pnp/sp @pnp/graph --save
+pnpm install @pnp/spfx-property-controls --save --save-exact
+
+
+/*
+    Add to webpart
+*/
+import { SPComponentLoader } from '@microsoft/sp-loader';
+import * as pnp from '@pnp/sp/presets/all';
+import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
+
+
+/*
+    Fix relative paths and remove unwanted metadata
+*/
+  protected onInit(): Promise < void > {
+    return super.onInit().then(_ => {
+      pnp.sp.setup({
+        spfxContext: this.context,
+        sp: {
+          headers: {
+            Accept: 'application/json;odata=nometadata'
+          }
+        }
+      });
+    });
+  }
+
+/*
+    Load external CDN files (JS/CSS)
+*/
+SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2020.2.513/styles/kendo.common-material.min.css');
+SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2020.2.513/styles/kendo.material.min.css');
+
+SPComponentLoader.loadScript('https://kendo.cdn.telerik.com/2020.2.513/js/jszip.min.js');
+SPComponentLoader.loadScript('https://kendo.cdn.telerik.com/2020.2.513/js/kendo.all.min.js');
+
+
+/*
+    Use npm version command to sync version numbers
+    --  add to package.json file  --
+*/
+  "scripts": {
+    "build": "gulp bundle",
+    "clean": "gulp clean",
+    "test": "gulp test",
+    "postversion": "gulp version-sync"
+  },
+
+/*
+    Replace gulpfile.js
+*/
+'use strict';
+
+const gulp = require('gulp');
+const build = require('@microsoft/sp-build-web');
+
+build.addSuppression(`Warning - [sass] The local CSS class 'ms-Grid' is not camelCase and will not be type-safe.`);
+
+build.initialize(require('gulp'));
+
+/*
+ *  Toolchain customization to keep build numbers synced using:
+ *  npm version (major|minor|patch)
+ * 
+ *  syncs the package.json with the /config/package-solution.json
+*/
+gulp.task('version-sync', _ => {
+    // import gulp utilities to write error messages
+    const gutil = require('gulp-util');
+
+    // import file system utilities form nodeJS
+    const fs = require('fs');
+
+    // read package.json
+    var pkgConfig = require('./package.json');
+
+    // read configuration of web part solution file
+    var pkgSolution = require('./config/package-solution.json');
+
+    // log old version
+    gutil.log('Old Version:\t' + pkgSolution.solution.version);
+
+    // Generate new MS compliant version number
+    var newVersionNumber = pkgConfig.version.split('-')[0] + '.0';
+
+    // assign newly generated version number to web part version
+    pkgSolution.solution.version = newVersionNumber;
+
+    // log new version
+    gutil.log('New Version:\t' + pkgSolution.solution.version);
+
+    // write changed package-solution file
+    fs.writeFile('./config/package-solution.json', JSON.stringify(pkgSolution, null, 2), (err) => {
+        gutil.log('Error updating file: ' + err);
+    });
+});

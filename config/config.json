@@ -1,0 +1,24 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "plm-training-catalog-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/plmTrainingCatalog/PlmTrainingCatalogWebPart.js",
+          "manifest": "./src/webparts/plmTrainingCatalog/PlmTrainingCatalogWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {
+    "jquery": {
+      "path": "https://code.jquery.com/jquery-3.5.1.min.js",
+      "globalName": "jQuery"
+    }
+  },
+  "localizedResources": {
+    "PlmTrainingCatalogWebPartStrings": "lib/webparts/plmTrainingCatalog/loc/{locale}.js",
+    "PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js"
+  }
+}
