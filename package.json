@@ -23,7 +23,9 @@
     "@pnp/sp": "^2.0.12",
     "@pnp/spfx-property-controls": "2.1.1",
     "@progress/kendo-ui": "^2020.3.1118",
-    "office-ui-fabric-core": "^11.0.0"
+    "office-ui-fabric-core": "^11.0.0",
+    "react": "16.8.0",
+    "react-dom": "16.8.0"
   },
   "devDependencies": {
     "@microsoft/rush-stack-compiler-3.3": "0.3.5",

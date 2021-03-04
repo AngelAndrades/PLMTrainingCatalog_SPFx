@@ -2,7 +2,8 @@ import { Version } from '@microsoft/sp-core-library';
 import {
   IPropertyPaneConfiguration,
   PropertyPaneHorizontalRule,
-  PropertyPaneTextField
+  PropertyPaneTextField,
+  PropertyPaneToggle
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { escape } from '@microsoft/sp-lodash-subset';
@@ -20,7 +21,9 @@ import { SPA } from './app/spa';
 export interface IPlmTrainingCatalogWebPartProps {
   catalog: string;
   roles: string;
-  link: string;
+  lnkSafe: string;
+  lnkWAM: string;
+  maturity: boolean;
 }
 
 export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPlmTrainingCatalogWebPartProps> {
@@ -47,7 +50,7 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
     //SPComponentLoader.loadScript('https://kendo.cdn.telerik.com/2020.3.1118/js/kendo.all.min.js');
 
     this.domElement.innerHTML = `<style>.k-tabstrip>.k-tabstrip-items>.k-item { text-transform: none; }</style>` +
-                                `<div id="tabstrip"><ul><li class="k-state-active">By Role</li><li>DevSecOps</li><li>SAFe</li></ul>` +
+                                `<div id="tabstrip"><ul><li class="k-state-active">By Role</li><li>DevSecOps</li><li>SAFe</li><li>Weekly Agile Meetings</li></ul>` +
                                 // Roles tab
                                 `<div><br /><div id="filters" style="margin: auto; padding: 1em; border: 1px solid lightgrey">` +
                                 `<p style="font-weight: bold; margin-top: 0;">Filter Training Catalog By:</p>` +
@@ -62,13 +65,17 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                                 // DevSecOps tab
                                 `<div><div id="grid2"></div></div>` + 
                                 // SAFe tab
+                                `<div></div>` +
+                                // WAM tab
                                 `<div></div></div>` +
                                 `<div id="dialog"></div>`;
     
     const app = SPA.getInstance({
       catalogGuid: this.properties.catalog,
       rolesGuid: this.properties.roles,
-      safeLink: this.properties.link
+      safeLink: this.properties.lnkSafe,
+      wamLink: this.properties.lnkWAM,
+      maturity: this.properties.maturity
     });
   }
 
@@ -113,8 +120,15 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                   key: 'listPickerFieldId'
                 }),
                 PropertyPaneHorizontalRule(),
-                PropertyPaneTextField('link', {
+                PropertyPaneTextField('lnkSafe', {
                   label: 'Paste the SAFe web page URL'
+                }),
+                PropertyPaneHorizontalRule(),
+                PropertyPaneTextField('lnkWAM', {
+                  label: 'Paste the Weekly Agile Meeting web page URL'
+                }),
+                PropertyPaneToggle('maturity', {
+                  label: 'Hide Maturity Level'
                 })
               ]
             }

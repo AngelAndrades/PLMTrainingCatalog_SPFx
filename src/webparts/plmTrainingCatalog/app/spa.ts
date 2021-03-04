@@ -3,17 +3,20 @@ import '@progress/kendo-ui';
 import { ds, dsExpand } from  './datasource';
 
 export class ModelState extends kendo.data.ObservableObject {
-    protected collapsed: string[] = [];
-
     constructor() {
         super();
     }
+
+    public tabName: string;
+    public redirectUrl: string;
 }
 
 export interface Params {
     catalogGuid: string;
     rolesGuid: string;
     safeLink: string;
+    wamLink: string;
+    maturity: boolean;
 }
 
 export class SPA {
@@ -36,6 +39,8 @@ export class SPA {
     constructor() {}
 
     public static getInstance(args: Params): SPA {
+        var appState = new ModelState();
+
         $(() => {
             this.tabStripOptions = {
                 tabPosition: 'top',
@@ -50,6 +55,16 @@ export class SPA {
                             this.catalogGrid.dataSource.filter({ field: 'DevSecOps', operator: 'eq', value: true });
                             break;
                         default:
+                            appState.tabName = e.item.textContent;
+                            appState.redirectUrl = (e.item.textContent == 'SAFe' ? args.safeLink : args.wamLink);
+
+                            this.dialog.content('<p>Click OK if you like to open a new browser window to display the ' + appState.tabName + ' information, otherwise click Cancel...</p>');
+                            this.dialog.setOptions({
+                                actions: [ 
+                                    { text: 'OK', primary: true, action: _ => { this.tabStrip.select(0); this.dialog.open(); window.open(appState.redirectUrl); return true; } },
+                                    { text: 'Cancel', action: _ => { this.dialog.close(); this.tabStrip.select(0); return false; } },
+                                ]
+                            });
                             this.dialog.open();
                     }
                 }
@@ -219,20 +234,15 @@ export class SPA {
                     mode: 'single',
                     showIndexes: true
                 },
-                toolbar: [ 
-                    { template: '<div style="display: inline-block; margin-top: 10px;"><input type="checkbox" id="maturity-switch" aria-label="Maturity Level Grouping" /> Group By Maturity Level</div>' },
-                    'search'
-                ],
+                toolbar: [ 'search' ],
                 columns: [
                     { field: 'Title', title: 'Course Name', width: 350, template: '<a href="#= LinktoResource #" title="Link to course for #= Title #" target="_blank">#= Title #</a>' },
                     { field: 'LearningHours', title: 'Learning Hours', width: 150 },
                     { field: 'Asset_x0020_Type', title: 'Asset Type', width: 300 },
                     { field: 'CourseSeries', title: 'Course Series', width: 400 },
                     { field: 'TMSItemID', title: 'TMS Item ID', width: 150 },
-                    { title: 'Product Line Information', columns: [
-                        { field: 'PLM_x0020_Maturity_x0020_Level', title: 'Maturity Level', width: 150 },
-                        { field: 'PLM_x0020_Roadmap_x0020_Focus', title: 'Roadmap Focus', width: 225 }
-                    ]},
+                    { field: 'PLM_x0020_Maturity_x0020_Level', title: 'Maturity Level', width: 150 },
+                    { field: 'PLM_x0020_Roadmap_x0020_Focus', title: 'Roadmap Focus', width: 225 },
                     { field: 'Role_x0028_s_x0029_', title: 'Roles', hidden: true },
                     { field: 'Keywords', title: 'Keywords', hidden: true }
                 ]
@@ -240,12 +250,31 @@ export class SPA {
 
             this.catalogGrid = $('#grid').kendoGrid(this.catalogGridOptions).data('kendoGrid');
             this.catalogGrid.dataSource.filter({ field: 'DevSecOps', operator: 'eq', value: false });
-            $('#maturity-switch').kendoSwitch({
+
+            // Property page switch to remove maturity grouping switch and hide maturity level & roadmap focus columns
+            if (!args.maturity) 
+            {
+                this.catalogGrid.setOptions({
+                    toolbar: [ 
+                        { template: '<div style="display: inline-block; margin-top: 10px;"><input type="checkbox" id="maturity-switch" aria-label="Maturity Level Grouping" /> Group By Maturity Level</div>' },
+                        'search'
+                    ]
+                });
+                $('#maturity-switch').kendoSwitch({
                 change: e => {
                     if (e.checked) this.catalogGrid.dataSource.group({ field: 'PLM_x0020_Maturity_x0020_Level' });
                     else this.catalogGrid.dataSource.group([]);
                 }
-            });
+                });
+                this.catalogGrid.showColumn('PLM_x0020_Maturity_x0020_Level');
+                this.catalogGrid.showColumn('PLM_x0020_Roadmap_x0020_Focus');
+            } else {
+                this.catalogGrid.setOptions({
+                    toolbar: [ 'search' ]
+                });
+                this.catalogGrid.hideColumn('PLM_x0020_Maturity_x0020_Level');
+                this.catalogGrid.hideColumn('PLM_x0020_Roadmap_x0020_Focus');
+            }
 
             this.devSecOpsGridOptions = {
                 dataSource: dsCatalog,
@@ -285,12 +314,7 @@ export class SPA {
                 width: 500,
                 title: 'Content Redirection',
                 closable: false,
-                modal: false,
-                content: '<p>Click OK if you like to open a new browser window to display the SAFe training information, otherwise click Cancel...</p>',
-                actions: [ 
-                    { text: 'OK', primary: true, action: e => { this.tabStrip.select(0); this.dialog.open(); window.open(args.safeLink); return true; } },
-                    { text: 'Cancel', action: e => { this.dialog.close(); this.tabStrip.select(0); return false; } },
-                ],
+                modal: false
             };
 
             this.dialog = $('#dialog').kendoDialog(this.dialogOptions).data('kendoDialog');
