@@ -3,7 +3,7 @@
   "solution": {
     "name": "plm-training-catalog-client-side-solution",
     "id": "1244f4a7-77e4-4c4c-9e64-5afacb73dd12",
-    "version": "1.0.0.0",
+    "version": "1.1.0.0",
     "includeClientSideAssets": true,
     "isDomainIsolated": false,
     "developer": {
