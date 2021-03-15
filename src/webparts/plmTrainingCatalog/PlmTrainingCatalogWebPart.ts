@@ -42,12 +42,12 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
   }
 
   public render(): void {
-    SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2020.3.1118/styles/kendo.common-material.min.css');
-    SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2020.3.1118/styles/kendo.material.min.css');
-    //SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2020.3.1118/styles/kendo.bootstrap-v4.min.css');
+    SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2021.1.224/styles/kendo.common-material.min.css');
+    SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2021.1.224/styles/kendo.material.min.css');
+    //SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2021.1.224/styles/kendo.bootstrap-v4.min.css');
 
-    SPComponentLoader.loadScript('https://kendo.cdn.telerik.com/2020.3.1118/js/jszip.min.js');
-    //SPComponentLoader.loadScript('https://kendo.cdn.telerik.com/2020.3.1118/js/kendo.all.min.js');
+    SPComponentLoader.loadScript('https://kendo.cdn.telerik.com/2021.1.224/js/jszip.min.js');
+    //SPComponentLoader.loadScript('https://kendo.cdn.telerik.com/2021.1.224/js/kendo.all.min.js');
 
     this.domElement.innerHTML = `<style>.k-tabstrip>.k-tabstrip-items>.k-item { text-transform: none; }</style>` +
                                 `<div id="tabstrip"><ul><li class="k-state-active">By Role</li><li>DevSecOps</li><li>SAFe</li><li>Weekly Agile Meetings</li></ul>` +

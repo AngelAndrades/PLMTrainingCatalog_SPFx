@@ -200,7 +200,7 @@ export class SPA {
                         Asset_x0020_Type: { type: 'string' },
                         PLM_x0020_Maturity_x0020_Level: { type: 'string' },
                         PLM_x0020_Roadmap_x0020_Focus: { type: 'string' },
-                        LinktoResource: { type: 'string' },
+                        Link_x0020_to_x0020_Resource: { type: 'string' },
                         Role_x0028_s_x0029_: { type: 'string' },
                         Keywords: { type: 'string' },
                         TMSItemID: { type: 'string' },
@@ -236,7 +236,7 @@ export class SPA {
                 },
                 toolbar: [ 'search' ],
                 columns: [
-                    { field: 'Title', title: 'Course Name', width: 350, template: '<a href="#= LinktoResource #" title="Link to course for #= Title #" target="_blank">#= Title #</a>' },
+                    { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
                     { field: 'LearningHours', title: 'Learning Hours', width: 150 },
                     { field: 'Asset_x0020_Type', title: 'Asset Type', width: 300 },
                     { field: 'CourseSeries', title: 'Course Series', width: 400 },
@@ -298,7 +298,7 @@ export class SPA {
                 },
                 toolbar: [ 'search' ],
                 columns: [
-                    { field: 'Title', title: 'Course Name', width: 350, template: '<a href="#= LinktoResource #" title="Link to course for #= Title #" target="_blank">#= Title #</a>' },
+                    { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
                     { field: 'LearningHours', title: 'Learning Hours', width: 150 },
                     { field: 'Asset_x0020_Type', title: 'Asset Type', width: 300 },
                     { field: 'CourseSeries', title: 'Course Series', width: 400 },

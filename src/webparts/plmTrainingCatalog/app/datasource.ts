@@ -60,7 +60,7 @@ export const dsExpand = (args: DataSourceConfig): kendo.data.DataSource => {
                             else {
                                 dataArray.map(e => {
                                     e.Asset_x0020_Type = (e.Asset_x0020_Type != undefined) ? e.Asset_x0020_Type.Title : '';
-                                    e.LinktoResource = (e.LinktoResource != undefined) ? e.LinktoResource.Url : '';
+                                    e.Link_x0020_to_x0020_Resource = (e.Link_x0020_to_x0020_Resource != undefined) ? e.Link_x0020_to_x0020_Resource : '';
                                     e.PLM_x0020_Maturity_x0020_Level = (e.PLM_x0020_Maturity_x0020_Level != undefined) ? e.PLM_x0020_Maturity_x0020_Level.Title : '' ;
                                     e.PLM_x0020_Roadmap_x0020_Focus = (e.PLM_x0020_Roadmap_x0020_Focus != undefined) ? e.PLM_x0020_Roadmap_x0020_Focus.Title : '';
                                     e.Role_x0028_s_x0029_ =  (e.Role_x0028_s_x0029_ != undefined) ? e.Role_x0028_s_x0029_.map(item => item.Subrole).join() : '';
@@ -75,7 +75,7 @@ export const dsExpand = (args: DataSourceConfig): kendo.data.DataSource => {
                     else {
                         dataArray.map(e => {
                             e.Asset_x0020_Type = (e.Asset_x0020_Type != undefined) ? e.Asset_x0020_Type.Title : '';
-                            e.LinktoResource = (e.LinktoResource != undefined) ? e.LinktoResource.Url : '';
+                            e.Link_x0020_to_x0020_Resource = (e.Link_x0020_to_x0020_Resource != undefined) ? e.Link_x0020_to_x0020_Resource : '';
                             e.PLM_x0020_Maturity_x0020_Level = (e.PLM_x0020_Maturity_x0020_Level != undefined) ? e.PLM_x0020_Maturity_x0020_Level.Title : '' ;
                             e.PLM_x0020_Roadmap_x0020_Focus = (e.PLM_x0020_Roadmap_x0020_Focus != undefined) ? e.PLM_x0020_Roadmap_x0020_Focus.Title : '';
                             e.Role_x0028_s_x0029_ =  (e.Role_x0028_s_x0029_ != undefined) ? e.Role_x0028_s_x0029_.map(item => item.Subrole).join() : '';
