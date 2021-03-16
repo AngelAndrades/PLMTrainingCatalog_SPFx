@@ -51,7 +51,7 @@ export const dsExpand = (args: DataSourceConfig): kendo.data.DataSource => {
                     return elem;
                 });
 
-                await sp.web.lists.getById(args.guid).items.select(selectedFields.join()).expand(args.expand.join()).top(1000).getPaged()
+                await sp.web.lists.getById(args.guid).items.select(selectedFields.join()).expand(args.expand.join()).top(5000).getPaged()
                 .then(response => {
                     const recurse = (next: any) => {
                         next.getNext().then(nestedResponse => {

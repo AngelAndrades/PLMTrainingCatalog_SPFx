@@ -24,6 +24,8 @@ export class SPA {
     protected static catalogGrid: kendo.ui.Grid;
     protected static devSecOpsGridOptions: kendo.ui.GridOptions;
     protected static devSecOpsGrid: kendo.ui.Grid;
+    protected static readingGridOptions: kendo.ui.GridOptions;
+    protected static readingGrid: kendo.ui.Grid;
     protected static organizationDropDownListOptions: kendo.ui.DropDownListOptions;
     protected static organizationDropDownList: kendo.ui.DropDownList;
     protected static teamDropDownListOptions: kendo.ui.DropDownListOptions;
@@ -49,10 +51,19 @@ export class SPA {
                 select: e => {
                     switch (e.item.textContent) {
                         case 'By Role':
-                            this.catalogGrid.dataSource.filter({ field: 'DevSecOps', operator: 'eq', value: false });
+                            this.catalogGrid.dataSource.filter([
+                                { field: 'DevSecOps', operator: 'eq', value: false },
+                                { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
+                            ]);
                             break;
                         case 'DevSecOps':
-                            this.catalogGrid.dataSource.filter({ field: 'DevSecOps', operator: 'eq', value: true });
+                            this.devSecOpsGrid.dataSource.filter([
+                                { field: 'DevSecOps', operator: 'eq', value: true },
+                                { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
+                            ]);
+                            break;
+                        case 'Recommended Reading':
+                            this.readingGrid.dataSource.filter({ field: 'Recommended_x0020_Reading', operator: 'eq', value: true });
                             break;
                         default:
                             appState.tabName = e.item.textContent;
@@ -204,7 +215,8 @@ export class SPA {
                         Role_x0028_s_x0029_: { type: 'string' },
                         Keywords: { type: 'string' },
                         TMSItemID: { type: 'string' },
-                        DevSecOps: { type: 'boolean' }
+                        DevSecOps: { type: 'boolean' },
+                        Recommended_x0020_Reading: { type: 'boolean' }
                     }
                 },
                 pageSize: 5,
@@ -249,7 +261,10 @@ export class SPA {
             };
 
             this.catalogGrid = $('#grid').kendoGrid(this.catalogGridOptions).data('kendoGrid');
-            this.catalogGrid.dataSource.filter({ field: 'DevSecOps', operator: 'eq', value: false });
+            this.catalogGrid.dataSource.filter([
+                { field: 'DevSecOps', operator: 'eq', value: false },
+                { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
+            ]);
 
             // Property page switch to remove maturity grouping switch and hide maturity level & roadmap focus columns
             if (!args.maturity) 
@@ -309,6 +324,39 @@ export class SPA {
 
             };
             this.devSecOpsGrid = $('#grid2').kendoGrid(this.devSecOpsGridOptions).data('kendoGrid');
+
+            this.readingGridOptions = {
+                dataSource: dsCatalog,
+                columnMenu: true,
+                editable: false,
+                filterable: true,
+                groupable: false,
+                navigatable: true,
+                pageable: {
+                    alwaysVisible: true,
+                    pageSizes: [5, 10, 20, 'All']
+                },
+                reorderable: true,
+                resizable: true,
+                scrollable: { virtual: 'column' },
+                sortable: {
+                    allowUnsort: false,
+                    initialDirection: 'asc',
+                    mode: 'single',
+                    showIndexes: true
+                },
+                toolbar: [ 'search' ],
+                columns: [
+                    { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
+                    { field: 'TMSItemID', title: 'TMS Item ID', width: 150 },
+                    { field: 'LearningHours', title: 'Learning Hours', width: 150 },
+                    { field: 'Asset_x0020_Type', title: 'Asset Type', width: 300 },
+                    { field: 'Role_x0028_s_x0029_', title: 'Roles', hidden: true },
+                    { field: 'Keywords', title: 'Keywords', hidden: true }
+                ]
+
+            };
+            this.readingGrid = $('#grid3').kendoGrid(this.readingGridOptions).data('kendoGrid');
     
             this.dialogOptions = {
                 width: 500,

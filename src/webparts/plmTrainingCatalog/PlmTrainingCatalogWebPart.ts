@@ -50,7 +50,7 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
     //SPComponentLoader.loadScript('https://kendo.cdn.telerik.com/2021.1.224/js/kendo.all.min.js');
 
     this.domElement.innerHTML = `<style>.k-tabstrip>.k-tabstrip-items>.k-item { text-transform: none; }</style>` +
-                                `<div id="tabstrip"><ul><li class="k-state-active">By Role</li><li>DevSecOps</li><li>SAFe</li><li>Weekly Agile Meetings</li></ul>` +
+                                `<div id="tabstrip"><ul><li class="k-state-active">By Role</li><li>DevSecOps</li><li>Recommended Reading</li><li>SAFe</li><li>Weekly Agile Meetings</li></ul>` +
                                 // Roles tab
                                 `<div><br /><div id="filters" style="margin: auto; padding: 1em; border: 1px solid lightgrey">` +
                                 `<p style="font-weight: bold; margin-top: 0;">Filter Training Catalog By:</p>` +
@@ -64,6 +64,8 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                                 `<div id="grid"></div></div>` + 
                                 // DevSecOps tab
                                 `<div><div id="grid2"></div></div>` + 
+                                // Recommended Reading tab
+                                `<div><div id="grid3"></div></div>` + 
                                 // SAFe tab
                                 `<div></div>` +
                                 // WAM tab
