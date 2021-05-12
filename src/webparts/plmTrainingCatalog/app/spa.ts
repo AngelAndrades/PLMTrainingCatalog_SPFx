@@ -104,6 +104,7 @@ export class SPA {
                 // Remove duplicate objects from the data source
                 org = dsFilterSharedDataSource.data().map(item => ({ Title: item['Title'] }));
                 org = org.filter((item, index, array) => array.findIndex(i => i.Title == item.Title) == index);
+                org.sort((x,y) => (x.Title > y.Title) ? 1 : -1);
 
                 this.organizationDropDownListOptions = {
                     autoBind: false,
@@ -118,9 +119,9 @@ export class SPA {
                         // Always Disable the Role DropDownList
                         this.roleDropDownList.enable(false);
 
-                        if (e.sender.value() === 'Product Team') {
+                        if (e.sender.value() === 'Product Team Level') {
                             // Filter duplicates
-                            team = dsFilterSharedDataSource.data().filter(item => item['Title'] == 'Product Team');
+                            team = dsFilterSharedDataSource.data().filter(item => item['Title'] == 'Product Team Level');
                             team = team.filter((item, index, array) => array.findIndex(i => i.Role == item.Role) == index);
 
                             // Set new data source (no duplicates)
@@ -155,7 +156,7 @@ export class SPA {
                         // Always set default grid filter
                         this.catalogGrid.dataSource.filter({ field: 'DevSecOps', operator: 'eq', value: false });
 
-                        if (this.organizationDropDownList.value() === 'Portfolio Team' || this.organizationDropDownList.value() === 'Product Line Team') {
+                        if (this.organizationDropDownList.value() === 'Portfolio Level' || this.organizationDropDownList.value() === 'Product Line Level') {
                             this.roleDropDownList.enable(false);
 
                             // Update grid filter for these values
