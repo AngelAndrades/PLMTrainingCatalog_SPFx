@@ -6,28 +6,31 @@ import {
   PropertyPaneToggle
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { escape } from '@microsoft/sp-lodash-subset';
+//import { escape } from '@microsoft/sp-lodash-subset';
 
 //import styles from './PlmTrainingCatalogWebPart.module.scss';
-import * as strings from 'PlmTrainingCatalogWebPartStrings';
+//import * as strings from 'PlmTrainingCatalogWebPartStrings';
 
-import * as $ from 'jquery';
-import '@progress/kendo-ui';
-import { SPComponentLoader } from '@microsoft/sp-loader';
+// Kendo UI styles
+import '@progress/kendo-ui/css/web/kendo.common-material.min.css';
+import '@progress/kendo-ui/css/web/kendo.material.min.css';
+import '@progress/kendo-ui/css/web/kendo.material.mobile.min.css';
+
+//import * as $ from 'jquery';
+//import '@progress/kendo-ui';
 import * as pnp from '@pnp/sp/presets/all';
 import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
 import { SPA } from './app/spa';
 
 export interface IPlmTrainingCatalogWebPartProps {
-  catalog: string;
-  roles: string;
+  catalogList: string;
+  rolesList: string;
+  maturityList: string;
   lnkSafe: string;
   lnkWAM: string;
-  maturity: boolean;
 }
 
 export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPlmTrainingCatalogWebPartProps> {
-
   protected onInit(): Promise < void > {
     return super.onInit().then(_ => {
       pnp.sp.setup({
@@ -42,13 +45,6 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
   }
 
   public render(): void {
-    SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2021.1.224/styles/kendo.common-material.min.css');
-    SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2021.1.224/styles/kendo.material.min.css');
-    //SPComponentLoader.loadCss('https://kendo.cdn.telerik.com/2021.1.224/styles/kendo.bootstrap-v4.min.css');
-
-    SPComponentLoader.loadScript('https://kendo.cdn.telerik.com/2021.1.224/js/jszip.min.js');
-    //SPComponentLoader.loadScript('https://kendo.cdn.telerik.com/2021.1.224/js/kendo.all.min.js');
-
     this.domElement.innerHTML = `<style>.k-tabstrip>.k-tabstrip-items>.k-item { text-transform: none; }</style>` +
                                 `<div id="tabstrip"><ul><li class="k-state-active">By Role</li><li>DevSecOps</li><li>Recommended Reading</li><li>SAFe</li><li>Weekly Agile Meetings</li></ul>` +
                                 // Roles tab
@@ -58,12 +54,19 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                                 `<br/>` +
                                 `<input id="team" disabled="disabled" style="width: 25vw; margin-bottom: 5px;" />` +
                                 `<br/>` +
-                                `<input id="role" disabled="disabled" style="width: 25vw;" />` +
+                                `<input id="role" disabled="disabled" style="width: 25vw; margin-bottom: 5px;" />` +
+                                `<br/>` +
+                                `<input id="byRoleMaturity" style="width: 25vw;" />` +
                                 `</div>` +
                                 `<br/>` +
                                 `<div id="grid"></div></div>` + 
                                 // DevSecOps tab
-                                `<div><div id="grid2"></div></div>` + 
+                                `<div><br /><div id="dsoFilters" style="margin: auto; padding: 1em; border: 1px solid lightgrey">` +
+                                `<p style="font-weight: bold; margin-top: 0;">Filter Training Catalog By:</p>` +
+                                `<input id="dsoMaturity" style="width: 25vw;" />` +
+                                `</div>` +
+                                `<br/>` +
+                                `<div id="grid2"></div></div>` + 
                                 // Recommended Reading tab
                                 `<div><div id="grid3"></div></div>` + 
                                 // SAFe tab
@@ -73,16 +76,22 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                                 `<div id="dialog"></div>`;
     
     const app = SPA.getInstance({
-      catalogGuid: this.properties.catalog,
-      rolesGuid: this.properties.roles,
+      catalogGuid: this.properties.catalogList,
+      rolesGuid: this.properties.rolesList,
+      maturityGuid: this.properties.maturityList,
       safeLink: this.properties.lnkSafe,
-      wamLink: this.properties.lnkWAM,
-      maturity: this.properties.maturity
+      wamLink: this.properties.lnkWAM
     });
   }
 
+  //@ts-expect-error
   protected get dataVersion(): Version {
     return Version.parse('1.0');
+  }
+
+  //@ts-expect-error
+  protected get disableReactivePropertyChanges(): boolean {
+    return true;
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
@@ -95,9 +104,9 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
           groups: [
             {
               groupFields: [
-                PropertyFieldListPicker('catalog', {
+                PropertyFieldListPicker('catalogList', {
                   label: 'Select the training catalog list',
-                  selectedList: this.properties.catalog,
+                  selectedList: this.properties.catalogList,
                   includeHidden: false,
                   orderBy: PropertyFieldListPickerOrderBy.Title,
                   disabled: false,
@@ -108,9 +117,22 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                   deferredValidationTime: 0,
                   key: 'listPickerFieldId'
                 }),
-                PropertyFieldListPicker('roles', {
+                PropertyFieldListPicker('rolesList', {
                   label: 'Select the roles list',
-                  selectedList: this.properties.roles,
+                  selectedList: this.properties.rolesList,
+                  includeHidden: false,
+                  orderBy: PropertyFieldListPickerOrderBy.Title,
+                  disabled: false,
+                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
+                  properties: this.properties,
+                  context: this.context,
+                  onGetErrorMessage: null,
+                  deferredValidationTime: 0,
+                  key: 'listPickerFieldId'
+                }),
+                PropertyFieldListPicker('maturityList', {
+                  label: 'Select the maturity list',
+                  selectedList: this.properties.maturityList,
                   includeHidden: false,
                   orderBy: PropertyFieldListPickerOrderBy.Title,
                   disabled: false,
@@ -128,9 +150,6 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                 PropertyPaneHorizontalRule(),
                 PropertyPaneTextField('lnkWAM', {
                   label: 'Paste the Weekly Agile Meeting web page URL'
-                }),
-                PropertyPaneToggle('maturity', {
-                  label: 'Hide Maturity Level'
                 })
               ]
             }

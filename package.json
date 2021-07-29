@@ -22,7 +22,7 @@
     "@pnp/graph": "^2.0.12",
     "@pnp/sp": "^2.0.12",
     "@pnp/spfx-property-controls": "2.1.1",
-    "@progress/kendo-ui": "^2020.3.1118",
+    "@progress/kendo-ui": "^2021.2.616",
     "office-ui-fabric-core": "^11.0.0",
     "react": "16.8.0",
     "react-dom": "16.8.0"
@@ -36,7 +36,7 @@
     "@types/chai": "3.4.34",
     "@types/es6-promise": "0.0.33",
     "@types/jquery": "^3.5.4",
-    "@types/kendo-ui": "^2020.3.0",
+    "@types/kendo-ui": "^2021.2.2",
     "@types/mocha": "2.2.38",
     "@types/webpack-env": "1.13.1",
     "ajv": "~5.2.2",

@@ -14,9 +14,9 @@ export class ModelState extends kendo.data.ObservableObject {
 export interface Params {
     catalogGuid: string;
     rolesGuid: string;
+    maturityGuid: string;
     safeLink: string;
     wamLink: string;
-    maturity: boolean;
 }
 
 export class SPA {
@@ -32,6 +32,9 @@ export class SPA {
     protected static teamDropDownList: kendo.ui.DropDownList;
     protected static roleDropDownListOptions: kendo.ui.DropDownListOptions;
     protected static roleDropDownList: kendo.ui.DropDownList;
+    protected static maturityDropDownListOptions: kendo.ui.DropDownListOptions;
+    protected static maturityDropDownList: kendo.ui.DropDownList;
+    protected static dsoMaturityDropDownList: kendo.ui.DropDownList;
     protected static tabStrip: kendo.ui.TabStrip;
     protected static tabStripOptions: kendo.ui.TabStripOptions;
     protected static dialog: kendo.ui.Dialog;
@@ -43,7 +46,35 @@ export class SPA {
     public static getInstance(args: Params): SPA {
         var appState = new ModelState();
 
-        $(() => {
+        const dsCatalog = dsExpand({
+            guid: args.catalogGuid,
+            dsName: 'dsCatalog',
+            schema: {
+                id: 'Id',
+                fields: {
+                    Id: { type: 'number' },
+                    Title: { type: 'string' },
+                    CourseSeries: { type: 'string' },
+                    LearningHours: { type: 'number' },
+                    Asset_x0020_Type: { type: 'string' },
+                    Maturity_x0020_Level: { type: 'string' },
+                    PLM_x0020_Roadmap_x0020_Focus: { type: 'string' },
+                    Link_x0020_to_x0020_Resource: { type: 'string' },
+                    Role_x0028_s_x0029_: { type: 'string' },
+                    Keywords: { type: 'string' },
+                    TMSItemID: { type: 'string' },
+                    DevSecOps: { type: 'boolean' },
+                    Recommended_x0020_Reading: { type: 'boolean' }
+                }
+            },
+            pageSize: 5,
+            sort: { field: 'Title', dir: 'asc' },
+            expand: ['Role_x0028_s_x0029_','Asset_x0020_Type','PLM_x0020_Roadmap_x0020_Focus'],
+            expandedFields: ['Role_x0028_s_x0029_/Subrole','Asset_x0020_Type/Title','PLM_x0020_Roadmap_x0020_Focus/Title'],
+            //filter: { field: 'DevSecOps', operator: 'equals', value: 0 }
+        });
+
+    $(() => {
             this.tabStripOptions = {
                 tabPosition: 'top',
                 animation: { open: { effects: 'fadeIn' } },
@@ -51,16 +82,20 @@ export class SPA {
                 select: e => {
                     switch (e.item.textContent) {
                         case 'By Role':
-                            this.catalogGrid.dataSource.filter([
+                            dsCatalog.filter([
                                 { field: 'DevSecOps', operator: 'eq', value: false },
                                 { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
                             ]);
+                            // reset maturity filter
+                            this.maturityDropDownList.select(0);
                             break;
                         case 'DevSecOps':
-                            this.devSecOpsGrid.dataSource.filter([
+                            dsCatalog.filter([
                                 { field: 'DevSecOps', operator: 'eq', value: true },
                                 { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
                             ]);
+                            // reset maturity filter
+                            this.dsoMaturityDropDownList.select(0);
                             break;
                         case 'Recommended Reading':
                             this.readingGrid.dataSource.filter({ field: 'Recommended_x0020_Reading', operator: 'eq', value: true });
@@ -85,6 +120,19 @@ export class SPA {
             let org = null;
             let team = null;
             let role = null;
+
+            const dsMaturityDataSource = ds({
+                guid: args.maturityGuid,
+                dsName: 'dsMaturityDataSource',
+                schema: {
+                    id: 'Id',
+                    fields: {
+                        Id: { type: 'number' },
+                        Title: { type: 'string' }
+                    }
+                },
+                sort: {field: 'Title', dir: 'asc'}
+            });
 
             const dsFilterSharedDataSource = ds({
                 guid: args.rolesGuid,
@@ -114,7 +162,13 @@ export class SPA {
                     optionLabel: 'Select your organizational level...',
                     change: e => {
                         // Always set default grid filter
-                        this.catalogGrid.dataSource.filter({ field: 'DevSecOps', operator: 'eq', value: false });
+                        dsCatalog.filter({
+                            logic: 'and',
+                            filters: [
+                                { field: 'DevSecOps', operator: 'eq', value: false },
+                                { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
+                            ]
+                        });
 
                         // Always Disable the Role DropDownList
                         this.roleDropDownList.enable(false);
@@ -135,11 +189,11 @@ export class SPA {
                             this.teamDropDownList.enable(false);
 
                             // Update grid filter for these values
-                            this.catalogGrid.dataSource.filter().logic = 'and';
-                            let filters = this.catalogGrid.dataSource.filter().filters;
+                            dsCatalog.filter().logic = 'and';
+                            let filters = dsCatalog.filter().filters;
                             let appendFilter = { field: 'Role_x0028_s_x0029_', operator: 'contains', value: e.sender.value() };
                             filters.push(appendFilter);
-                            this.catalogGrid.dataSource.filter(filters);
+                            dsCatalog.filter(filters);
                         }
                     }
                 };
@@ -154,17 +208,23 @@ export class SPA {
                     optionLabel: 'Select your team/role...',
                     change: e => {
                         // Always set default grid filter
-                        this.catalogGrid.dataSource.filter({ field: 'DevSecOps', operator: 'eq', value: false });
+                        dsCatalog.filter({
+                            logic: 'and',
+                            filters: [
+                                { field: 'DevSecOps', operator: 'eq', value: false },
+                                { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
+                            ]
+                        });
 
                         if (this.organizationDropDownList.value() === 'Portfolio Level' || this.organizationDropDownList.value() === 'Product Line Level') {
                             this.roleDropDownList.enable(false);
 
                             // Update grid filter for these values
-                            this.catalogGrid.dataSource.filter().logic = 'and';
-                            let filters = this.catalogGrid.dataSource.filter().filters;
+                            dsCatalog.filter().logic = 'and';
+                            let filters = dsCatalog.filter().filters;
                             let appendFilter = { field: 'Role_x0028_s_x0029_', operator: 'contains', value: e.sender.value() };
                             filters.push(appendFilter);
-                            this.catalogGrid.dataSource.filter(filters);
+                            dsCatalog.filter(filters);
                         } else {
                             // Filter duplicates
                             role = dsFilterSharedDataSource.data().filter(item => item['Role'] == e.sender.value());
@@ -186,47 +246,42 @@ export class SPA {
                     optionLabel: 'Select your role...',
                     change: e => {
                         // Always set default grid filter
-                        this.catalogGrid.dataSource.filter({ field: 'DevSecOps', operator: 'eq', value: false });
+                        dsCatalog.filter({
+                            logic: 'and',
+                            filters: [
+                                { field: 'DevSecOps', operator: 'eq', value: false },
+                                { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
+                            ]
+                        });
 
                         // Update grid filter for these values
-                        this.catalogGrid.dataSource.filter().logic = 'and';
-                        let filters = this.catalogGrid.dataSource.filter().filters;
+                        dsCatalog.filter().logic = 'and';
+                        let filters = dsCatalog.filter().filters;
                         let appendFilter = { field: 'Role_x0028_s_x0029_', operator: 'contains', value: e.sender.value() };
                         filters.push(appendFilter);
-                        this.catalogGrid.dataSource.filter(filters);
+                        dsCatalog.filter(filters);
                     }
                 };
                 this.roleDropDownList = $('#role').kendoDropDownList(this.roleDropDownListOptions).data('kendoDropDownList');
+
+                this.maturityDropDownListOptions = {
+                    dataSource: dsMaturityDataSource,
+                    dataTextField: 'Title',
+                    dataValueField: 'Title',
+                    optionLabel: 'All maturity levels...',
+                    change: e => {
+                        // reset default filters
+                        let currentFilters = dsCatalog.filter().filters.filter(obj => obj['field'] !== 'Maturity_x0020_Level');
+
+                        // append new filter if applicable
+                        if (e.sender.value() !== '') currentFilters.push({field: 'Maturity_x0020_Level', operator: 'Contains', value: e.sender.value()});
+                        dsCatalog.filter(currentFilters);
+                    }
+                };
+                this.maturityDropDownList = $('#byRoleMaturity').kendoDropDownList(this.maturityDropDownListOptions).data('kendoDropDownList');
+                this.dsoMaturityDropDownList = $('#dsoMaturity').kendoDropDownList(this.maturityDropDownListOptions).data('kendoDropDownList');
             });
             
-            const dsCatalog = dsExpand({
-                guid: args.catalogGuid,
-                dsName: 'dsCatalog',
-                schema: {
-                    id: 'Id',
-                    fields: {
-                        Id: { type: 'number' },
-                        Title: { type: 'string' },
-                        CourseSeries: { type: 'string' },
-                        LearningHours: { type: 'number' },
-                        Asset_x0020_Type: { type: 'string' },
-                        PLM_x0020_Maturity_x0020_Level: { type: 'string' },
-                        PLM_x0020_Roadmap_x0020_Focus: { type: 'string' },
-                        Link_x0020_to_x0020_Resource: { type: 'string' },
-                        Role_x0028_s_x0029_: { type: 'string' },
-                        Keywords: { type: 'string' },
-                        TMSItemID: { type: 'string' },
-                        DevSecOps: { type: 'boolean' },
-                        Recommended_x0020_Reading: { type: 'boolean' }
-                    }
-                },
-                pageSize: 5,
-                sort: { field: 'Title', dir: 'asc' },
-                expand: ['Role_x0028_s_x0029_','Asset_x0020_Type','PLM_x0020_Maturity_x0020_Level','PLM_x0020_Roadmap_x0020_Focus'],
-                expandedFields: ['Role_x0028_s_x0029_/Subrole','Asset_x0020_Type/Title','PLM_x0020_Maturity_x0020_Level/Title','PLM_x0020_Roadmap_x0020_Focus/Title'],
-                //filter: { field: 'DevSecOps', operator: 'equals', value: 0 }
-            });
-
             this.catalogGridOptions = {
                 dataSource: dsCatalog,
                 columnMenu: true,
@@ -236,6 +291,7 @@ export class SPA {
                 navigatable: true,
                 pageable: {
                     alwaysVisible: true,
+                    buttonCount: 3,
                     pageSizes: [5, 10, 20, 'All']
                 },
                 reorderable: true,
@@ -252,45 +308,19 @@ export class SPA {
                     { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
                     { field: 'LearningHours', title: 'Learning Hours', width: 150 },
                     { field: 'Asset_x0020_Type', title: 'Asset Type', width: 300 },
-                    { field: 'CourseSeries', title: 'Course Series', width: 400 },
-                    { field: 'TMSItemID', title: 'TMS Item ID', width: 150 },
-                    { field: 'PLM_x0020_Maturity_x0020_Level', title: 'Maturity Level', width: 150 },
-                    { field: 'PLM_x0020_Roadmap_x0020_Focus', title: 'Roadmap Focus', width: 225 },
+                    { field: 'CourseSeries', title: 'Course Series', width: 150 },
+                    { field: 'TMSItemID', title: 'TMS Item ID', width: 175 },
+                    { field: 'Maturity_x0020_Level', title: 'Maturity Level', width: 150, hidden: true },
+                    //{ field: 'PLM_x0020_Roadmap_x0020_Focus', title: 'Roadmap Focus', width: 225 },
                     { field: 'Role_x0028_s_x0029_', title: 'Roles', hidden: true },
                     { field: 'Keywords', title: 'Keywords', hidden: true }
                 ]
             };
-
             this.catalogGrid = $('#grid').kendoGrid(this.catalogGridOptions).data('kendoGrid');
             this.catalogGrid.dataSource.filter([
                 { field: 'DevSecOps', operator: 'eq', value: false },
                 { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
             ]);
-
-            // Property page switch to remove maturity grouping switch and hide maturity level & roadmap focus columns
-            if (!args.maturity) 
-            {
-                this.catalogGrid.setOptions({
-                    toolbar: [ 
-                        { template: '<div style="display: inline-block; margin-top: 10px;"><input type="checkbox" id="maturity-switch" aria-label="Maturity Level Grouping" /> Group By Maturity Level</div>' },
-                        'search'
-                    ]
-                });
-                $('#maturity-switch').kendoSwitch({
-                change: e => {
-                    if (e.checked) this.catalogGrid.dataSource.group({ field: 'PLM_x0020_Maturity_x0020_Level' });
-                    else this.catalogGrid.dataSource.group([]);
-                }
-                });
-                this.catalogGrid.showColumn('PLM_x0020_Maturity_x0020_Level');
-                this.catalogGrid.showColumn('PLM_x0020_Roadmap_x0020_Focus');
-            } else {
-                this.catalogGrid.setOptions({
-                    toolbar: [ 'search' ]
-                });
-                this.catalogGrid.hideColumn('PLM_x0020_Maturity_x0020_Level');
-                this.catalogGrid.hideColumn('PLM_x0020_Roadmap_x0020_Focus');
-            }
 
             this.devSecOpsGridOptions = {
                 dataSource: dsCatalog,
@@ -301,6 +331,7 @@ export class SPA {
                 navigatable: true,
                 pageable: {
                     alwaysVisible: true,
+                    buttonCount: 3,
                     pageSizes: [5, 10, 20, 'All']
                 },
                 reorderable: true,
@@ -335,6 +366,7 @@ export class SPA {
                 navigatable: true,
                 pageable: {
                     alwaysVisible: true,
+                    buttonCount: 3,
                     pageSizes: [5, 10, 20, 'All']
                 },
                 reorderable: true,
