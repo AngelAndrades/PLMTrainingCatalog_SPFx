@@ -57,7 +57,7 @@ export class SPA {
                     CourseSeries: { type: 'string' },
                     LearningHours: { type: 'number' },
                     Asset_x0020_Type: { type: 'string' },
-                    Maturity_x0020_Level: { type: 'string' },
+                    DSO_x0020_Maturity_x0020_Level: { type: 'string' },
                     PLM_x0020_Roadmap_x0020_Focus: { type: 'string' },
                     Link_x0020_to_x0020_Resource: { type: 'string' },
                     Role_x0028_s_x0029_: { type: 'string' },
@@ -74,7 +74,20 @@ export class SPA {
             //filter: { field: 'DevSecOps', operator: 'equals', value: 0 }
         });
 
-    $(() => {
+        const dsMaturityDataSource = ds({
+            guid: args.maturityGuid,
+            dsName: 'dsMaturityDataSource',
+            schema: {
+                id: 'Id',
+                fields: {
+                    Id: { type: 'number' },
+                    Title: { type: 'string' }
+                }
+            },
+            sort: {field: 'Id', dir: 'asc'}
+        });
+
+$(() => {
             this.tabStripOptions = {
                 tabPosition: 'top',
                 animation: { open: { effects: 'fadeIn' } },
@@ -120,19 +133,6 @@ export class SPA {
             let org = null;
             let team = null;
             let role = null;
-
-            const dsMaturityDataSource = ds({
-                guid: args.maturityGuid,
-                dsName: 'dsMaturityDataSource',
-                schema: {
-                    id: 'Id',
-                    fields: {
-                        Id: { type: 'number' },
-                        Title: { type: 'string' }
-                    }
-                },
-                sort: {field: 'Title', dir: 'asc'}
-            });
 
             const dsFilterSharedDataSource = ds({
                 guid: args.rolesGuid,
@@ -268,13 +268,13 @@ export class SPA {
                     dataSource: dsMaturityDataSource,
                     dataTextField: 'Title',
                     dataValueField: 'Title',
-                    optionLabel: 'All maturity levels...',
+                    optionLabel: 'Select all DSO Maturity Levels...',
                     change: e => {
                         // reset default filters
-                        let currentFilters = dsCatalog.filter().filters.filter(obj => obj['field'] !== 'Maturity_x0020_Level');
+                        let currentFilters = dsCatalog.filter().filters.filter(obj => obj['field'] !== 'DSO_x0020_Maturity_x0020_Level');
 
                         // append new filter if applicable
-                        if (e.sender.value() !== '') currentFilters.push({field: 'Maturity_x0020_Level', operator: 'Contains', value: e.sender.value()});
+                        if (e.sender.value() !== '') currentFilters.push({field: 'DSO_x0020_Maturity_x0020_Level', operator: 'Contains', value: e.sender.value()});
                         dsCatalog.filter(currentFilters);
                     }
                 };
@@ -303,14 +303,14 @@ export class SPA {
                     mode: 'single',
                     showIndexes: true
                 },
-                toolbar: [ 'search' ],
+                //toolbar: [ 'search' ],
                 columns: [
                     { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
                     { field: 'LearningHours', title: 'Learning Hours', width: 150 },
                     { field: 'Asset_x0020_Type', title: 'Asset Type', width: 300 },
                     { field: 'CourseSeries', title: 'Course Series', width: 150 },
                     { field: 'TMSItemID', title: 'TMS Item ID', width: 175 },
-                    { field: 'Maturity_x0020_Level', title: 'Maturity Level', width: 150, hidden: true },
+                    { field: 'DSO_x0020_Maturity_x0020_Level', title: 'DSO Maturity Level', width: 225, hidden: false, template: dataItem => { if (dataItem.DSO_x0020_Maturity_x0020_Level != null) return dataItem.DSO_x0020_Maturity_x0020_Level.replaceAll(',', ', '); else return ''; } },
                     //{ field: 'PLM_x0020_Roadmap_x0020_Focus', title: 'Roadmap Focus', width: 225 },
                     { field: 'Role_x0028_s_x0029_', title: 'Roles', hidden: true },
                     { field: 'Keywords', title: 'Keywords', hidden: true }
@@ -343,13 +343,14 @@ export class SPA {
                     mode: 'single',
                     showIndexes: true
                 },
-                toolbar: [ 'search' ],
+                //toolbar: [ 'search' ],
                 columns: [
                     { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
                     { field: 'LearningHours', title: 'Learning Hours', width: 150 },
                     { field: 'Asset_x0020_Type', title: 'Asset Type', width: 300 },
                     { field: 'CourseSeries', title: 'Course Series', width: 400 },
-                    { field: 'TMSItemID', title: 'TMS Item ID', width: 150 },
+                    { field: 'TMSItemID', title: 'TMS Item ID', width: 175 },
+                    { field: 'DSO_x0020_Maturity_x0020_Level', title: 'DSO Maturity Level', width: 225, hidden: false, template: dataItem => { if (dataItem.DSO_x0020_Maturity_x0020_Level != null) return dataItem.DSO_x0020_Maturity_x0020_Level.replaceAll(',', ', '); else return ''; } },
                     { field: 'Role_x0028_s_x0029_', title: 'Roles', hidden: true },
                     { field: 'Keywords', title: 'Keywords', hidden: true }
                 ]
