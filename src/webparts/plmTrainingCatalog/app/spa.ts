@@ -268,7 +268,7 @@ $(() => {
                     dataSource: dsMaturityDataSource,
                     dataTextField: 'Title',
                     dataValueField: 'Title',
-                    optionLabel: 'Select all DSO Maturity Levels...',
+                    optionLabel: 'Select your DSO Maturity Level...',
                     change: e => {
                         // reset default filters
                         let currentFilters = dsCatalog.filter().filters.filter(obj => obj['field'] !== 'DSO_x0020_Maturity_x0020_Level');
