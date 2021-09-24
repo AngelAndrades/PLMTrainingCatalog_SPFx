@@ -105,7 +105,7 @@ $(() => {
                                 { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
                             ]);
                             // reset maturity filter
-                            this.maturityDropDownList.select(0);
+                            if (args.enableMaturity) this.maturityDropDownList.select(0);
                             break;
                         case 'DevSecOps':
                             dsCatalog.filter([
@@ -113,7 +113,7 @@ $(() => {
                                 { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
                             ]);
                             // reset maturity filter
-                            this.dsoMaturityDropDownList.select(0);
+                            if (args.enableMaturity) this.dsoMaturityDropDownList.select(0);
                             break;
                         case 'Recommended Reading':
                             this.readingGrid.dataSource.filter({ field: 'Recommended_x0020_Reading', operator: 'eq', value: true });
@@ -316,10 +316,11 @@ $(() => {
                 },
                 toolbar: [ 'excel', 'pdf' ],
                 excel: {
-                    fileName: 'DSO Training Export.xlsx',
+                    fileName: 'DSO ByRole Training Export.xlsx',
                     filterable: true
                 },
                 pdf: {
+                    fileName: 'DSO ByRole Training Export.pdf',
                     allPages: true,
                     avoidLinks: false,
                     paperSize: 'letter',
@@ -368,6 +369,20 @@ $(() => {
                     showIndexes: true
                 },
                 //toolbar: [ 'search' ],
+                toolbar: [ 'excel', 'pdf' ],
+                excel: {
+                    fileName: 'DevSecOps Training Export.xlsx',
+                    filterable: true
+                },
+                pdf: {
+                    fileName: 'DevSecOps Training Export.pdf',
+                    allPages: true,
+                    avoidLinks: false,
+                    paperSize: 'letter',
+                    margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' },
+                    landscape: true,
+                    scale: 0.8
+                },
                 columns: [
                     { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
                     { field: 'LearningHours', title: 'Learning Hours', width: 150 },
@@ -404,7 +419,21 @@ $(() => {
                     mode: 'single',
                     showIndexes: true
                 },
-                toolbar: [ 'search' ],
+                toolbar: [ 'search', 'excel', 'pdf' ],
+                excel: {
+                    fileName: 'DevSecOps Recommended Reading Export.xlsx',
+                    filterable: true
+                },
+                pdf: {
+                    fileName: 'DevSecOps Recommended Reading Export.pdf',
+                    allPages: true,
+                    avoidLinks: false,
+                    paperSize: 'letter',
+                    margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' },
+                    landscape: true,
+                    scale: 0.8
+                },
+                
                 columns: [
                     { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
                     { field: 'TMSItemID', title: 'TMS Item ID', width: 150 },
