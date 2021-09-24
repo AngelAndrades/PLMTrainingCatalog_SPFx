@@ -28,6 +28,7 @@ export interface IPlmTrainingCatalogWebPartProps {
   maturityList: string;
   lnkSafe: string;
   lnkWAM: string;
+  enableMaturity: boolean;
 }
 
 export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPlmTrainingCatalogWebPartProps> {
@@ -80,7 +81,8 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
       rolesGuid: this.properties.rolesList,
       maturityGuid: this.properties.maturityList,
       safeLink: this.properties.lnkSafe,
-      wamLink: this.properties.lnkWAM
+      wamLink: this.properties.lnkWAM,
+      enableMaturity: this.properties.enableMaturity
     });
   }
 
@@ -150,7 +152,12 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                 PropertyPaneHorizontalRule(),
                 PropertyPaneTextField('lnkWAM', {
                   label: 'Paste the Weekly Agile Meeting web page URL'
-                })
+                }),
+                PropertyPaneToggle('enableMaturity', {
+                  label: 'Enable Maturity Level Filter',
+                  checked: false
+                }
+                )
               ]
             }
           ]

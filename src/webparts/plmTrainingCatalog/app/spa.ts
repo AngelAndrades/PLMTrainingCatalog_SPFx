@@ -18,6 +18,7 @@ export interface Params {
     maturityGuid: string;
     safeLink: string;
     wamLink: string;
+    enableMaturity: boolean;
 }
 
 export class SPA {
@@ -282,8 +283,14 @@ $(() => {
                         dsCatalog.filter(currentFilters);
                     }
                 };
-                this.maturityDropDownList = $('#byRoleMaturity').kendoDropDownList(this.maturityDropDownListOptions).data('kendoDropDownList');
-                this.dsoMaturityDropDownList = $('#dsoMaturity').kendoDropDownList(this.maturityDropDownListOptions).data('kendoDropDownList');
+                if (args.enableMaturity) {
+                    this.maturityDropDownList = $('#byRoleMaturity').kendoDropDownList(this.maturityDropDownListOptions).data('kendoDropDownList');
+                    this.dsoMaturityDropDownList = $('#dsoMaturity').kendoDropDownList(this.maturityDropDownListOptions).data('kendoDropDownList');
+                } else {
+                    $('#byRoleMaturity').hide();
+                    $('#dsoFilters').hide();
+                }
+                
             });
             
             this.catalogGridOptions = {
@@ -326,13 +333,14 @@ $(() => {
                     { field: 'Asset_x0020_Type', title: 'Asset Type', width: 300 },
                     { field: 'CourseSeries', title: 'Course Series', width: 150 },
                     { field: 'TMSItemID', title: 'TMS Item ID', width: 175 },
-                    { field: 'DSO_x0020_Maturity_x0020_Level', title: 'DSO Maturity Level', width: 225, hidden: false, template: dataItem => { if (dataItem.DSO_x0020_Maturity_x0020_Level != null) return dataItem.DSO_x0020_Maturity_x0020_Level.replaceAll(',', ', '); else return ''; } },
+                    { field: 'DSO_x0020_Maturity_x0020_Level', title: 'DSO Maturity Level', width: 225, hidden: true, template: dataItem => { if (dataItem.DSO_x0020_Maturity_x0020_Level != null) return dataItem.DSO_x0020_Maturity_x0020_Level.replaceAll(',', ', '); else return ''; } },
                     //{ field: 'PLM_x0020_Roadmap_x0020_Focus', title: 'Roadmap Focus', width: 225 },
                     { field: 'Role_x0028_s_x0029_', title: 'Roles', hidden: true },
                     { field: 'Keywords', title: 'Keywords', hidden: true, exportable: false }
                 ]
             };
             this.catalogGrid = $('#grid').kendoGrid(this.catalogGridOptions).data('kendoGrid');
+            if(args.enableMaturity) this.catalogGrid.showColumn('DSO_x0020_Maturity_x0020_Level');
             this.catalogGrid.dataSource.filter([
                 { field: 'DevSecOps', operator: 'eq', value: false },
                 { field: 'Recommended_x0020_Reading', operator: 'eq', value: false }
@@ -366,13 +374,14 @@ $(() => {
                     { field: 'Asset_x0020_Type', title: 'Asset Type', width: 300 },
                     { field: 'CourseSeries', title: 'Course Series', width: 400 },
                     { field: 'TMSItemID', title: 'TMS Item ID', width: 175 },
-                    { field: 'DSO_x0020_Maturity_x0020_Level', title: 'DSO Maturity Level', width: 225, hidden: false, template: dataItem => { if (dataItem.DSO_x0020_Maturity_x0020_Level != null) return dataItem.DSO_x0020_Maturity_x0020_Level.replaceAll(',', ', '); else return ''; } },
+                    { field: 'DSO_x0020_Maturity_x0020_Level', title: 'DSO Maturity Level', width: 225, hidden: true, template: dataItem => { if (dataItem.DSO_x0020_Maturity_x0020_Level != null) return dataItem.DSO_x0020_Maturity_x0020_Level.replaceAll(',', ', '); else return ''; } },
                     { field: 'Role_x0028_s_x0029_', title: 'Roles', hidden: true },
-                    { field: 'Keywords', title: 'Keywords', hidden: true }
+                    { field: 'Keywords', title: 'Keywords', hidden: true, exportable: false }
                 ]
 
             };
             this.devSecOpsGrid = $('#grid2').kendoGrid(this.devSecOpsGridOptions).data('kendoGrid');
+            if(args.enableMaturity) this.devSecOpsGrid.showColumn('DSO_x0020_Maturity_x0020_Level');
 
             this.readingGridOptions = {
                 dataSource: dsCatalog,
