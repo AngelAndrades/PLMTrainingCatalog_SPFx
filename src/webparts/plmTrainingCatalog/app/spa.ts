@@ -1,4 +1,5 @@
 import * as $ from 'jquery';
+import * as JSZip from 'jszip';
 import '@progress/kendo-ui';
 import { ds, dsExpand } from  './datasource';
 
@@ -216,7 +217,7 @@ $(() => {
                             ]
                         });
 
-                        if (this.organizationDropDownList.value() === 'Portfolio Level' || this.organizationDropDownList.value() === 'Product Line Level') {
+                        if(['Portfolio Level','Product Line Level','Supporting Role','Technical Manager/Solution Architect'].includes(this.organizationDropDownList.value())) {
                             this.roleDropDownList.enable(false);
 
                             // Update grid filter for these values
@@ -303,7 +304,19 @@ $(() => {
                     mode: 'single',
                     showIndexes: true
                 },
-                //toolbar: [ 'search' ],
+                toolbar: [ 'excel', 'pdf' ],
+                excel: {
+                    fileName: 'DSO Training Export.xlsx',
+                    filterable: true
+                },
+                pdf: {
+                    allPages: true,
+                    avoidLinks: false,
+                    paperSize: 'letter',
+                    margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' },
+                    landscape: false,
+                    scale: 1.0
+                },
                 columns: [
                     { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
                     { field: 'LearningHours', title: 'Learning Hours', width: 150 },

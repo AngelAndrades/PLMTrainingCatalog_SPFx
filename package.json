@@ -23,6 +23,7 @@
     "@pnp/sp": "^2.0.12",
     "@pnp/spfx-property-controls": "2.1.1",
     "@progress/kendo-ui": "^2021.2.616",
+    "jszip": "^3.7.1",
     "office-ui-fabric-core": "^11.0.0",
     "react": "16.8.0",
     "react-dom": "16.8.0"
