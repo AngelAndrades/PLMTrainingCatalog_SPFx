@@ -47,6 +47,9 @@ export class SPA {
     public static getInstance(args: Params): SPA {
         var appState = new ModelState();
 
+        // Required for Excel Export to work with Grid
+        window['JSZip'] = JSZip;
+
         const dsCatalog = dsExpand({
             guid: args.catalogGuid,
             dsName: 'dsCatalog',
@@ -314,8 +317,8 @@ $(() => {
                     avoidLinks: false,
                     paperSize: 'letter',
                     margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' },
-                    landscape: false,
-                    scale: 1.0
+                    landscape: true,
+                    scale: 0.8
                 },
                 columns: [
                     { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
@@ -326,7 +329,7 @@ $(() => {
                     { field: 'DSO_x0020_Maturity_x0020_Level', title: 'DSO Maturity Level', width: 225, hidden: false, template: dataItem => { if (dataItem.DSO_x0020_Maturity_x0020_Level != null) return dataItem.DSO_x0020_Maturity_x0020_Level.replaceAll(',', ', '); else return ''; } },
                     //{ field: 'PLM_x0020_Roadmap_x0020_Focus', title: 'Roadmap Focus', width: 225 },
                     { field: 'Role_x0028_s_x0029_', title: 'Roles', hidden: true },
-                    { field: 'Keywords', title: 'Keywords', hidden: true }
+                    { field: 'Keywords', title: 'Keywords', hidden: true, exportable: false }
                 ]
             };
             this.catalogGrid = $('#grid').kendoGrid(this.catalogGridOptions).data('kendoGrid');
