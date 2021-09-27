@@ -2,6 +2,7 @@ import * as $ from 'jquery';
 import * as JSZip from 'jszip';
 import '@progress/kendo-ui';
 import { ds, dsExpand } from  './datasource';
+import { sp, objectToSPKeyValueCollection } from '@pnp/sp/presets/all';
 
 export class ModelState extends kendo.data.ObservableObject {
     constructor() {
@@ -28,6 +29,8 @@ export class SPA {
     protected static devSecOpsGrid: kendo.ui.Grid;
     protected static readingGridOptions: kendo.ui.GridOptions;
     protected static readingGrid: kendo.ui.Grid;
+    protected static wamGridOptions: kendo.ui.GridOptions;
+    protected static wamGrid: kendo.ui.Grid;
     protected static organizationDropDownListOptions: kendo.ui.DropDownListOptions;
     protected static organizationDropDownList: kendo.ui.DropDownList;
     protected static teamDropDownListOptions: kendo.ui.DropDownListOptions;
@@ -122,14 +125,17 @@ $(() => {
                             appState.tabName = e.item.textContent;
                             appState.redirectUrl = (e.item.textContent == 'SAFe' ? args.safeLink : args.wamLink);
 
-                            this.dialog.content('<p>Click OK if you like to open a new browser window to display the ' + appState.tabName + ' information, otherwise click Cancel...</p>');
-                            this.dialog.setOptions({
-                                actions: [ 
-                                    { text: 'OK', primary: true, action: _ => { this.tabStrip.select(0); this.dialog.open(); window.open(appState.redirectUrl); return true; } },
-                                    { text: 'Cancel', action: _ => { this.dialog.close(); this.tabStrip.select(0); return false; } },
-                                ]
-                            });
-                            this.dialog.open();
+                            if (appState.redirectUrl.startsWith('http'))
+                            {
+                                this.dialog.content('<p>Click OK if you like to open a new browser window to display the ' + appState.tabName + ' information, otherwise click Cancel...</p>');
+                                this.dialog.setOptions({
+                                    actions: [ 
+                                        { text: 'OK', primary: true, action: _ => { this.tabStrip.select(0); this.dialog.open(); window.open(appState.redirectUrl); return true; } },
+                                        { text: 'Cancel', action: _ => { this.dialog.close(); this.tabStrip.select(0); return false; } },
+                                    ]
+                                });
+                                this.dialog.open();
+                            }
                     }
                 }
             };
@@ -455,6 +461,87 @@ $(() => {
 
             this.dialog = $('#dialog').kendoDialog(this.dialogOptions).data('kendoDialog');
             this.dialog.close();
+
+            if (!args.wamLink.startsWith('http'))
+            {
+                const dsWAM = new kendo.data.DataSource({
+                    transport: {
+                        read: async options => {
+                            $.ajax({
+                                url: "https://dvagov.sharepoint.com/sites/OITACOEPortal/agilecoach/_api/web/Lists(guid'" + args.wamLink + "')/items?$select=Title,Topic,PresentationSubTopic,FileRef,Modified&$top=5000",
+                                method: 'GET',
+                                headers: {
+                                    'Accept':'application/json; odata=nometadata'
+                                }
+                            })
+                            .then(data => {
+                                options.success(data.value);
+                            });
+                        }
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                Title: { type: 'string' },
+                                Topic: { type: 'string' },
+                                PresentationSubTopic: { type: 'string' },
+                                FileRef: {type: 'string' },
+                                Modified: { type: 'date' }
+                            }
+                        }
+                    },
+                    pageSize: 10,
+                    sort: [
+                        { field: 'Topic', dir: 'asc'},
+                        { field: 'Title', dir: 'asc' }
+                    ]
+                    //group: { field: 'Topic', dir: 'asc'}
+                });
+                
+                this.wamGridOptions = {
+                    dataSource: dsWAM,
+                    columnMenu: true,
+                    editable: false,
+                    filterable: true,
+                    groupable: false,
+                    navigatable: true,
+                    pageable: {
+                        alwaysVisible: true,
+                        buttonCount: 3,
+                        pageSizes: [5, 10, 20, 'All']
+                    },
+                    reorderable: true,
+                    resizable: true,
+                    scrollable: { virtual: 'column' },
+                    sortable: {
+                        allowUnsort: false,
+                        initialDirection: 'asc',
+                        mode: 'single',
+                        showIndexes: true
+                    },
+                    toolbar: [ 'search' ],
+
+                    columns: [
+                        { field: 'Title', title: 'File Name', width: 250, template: dataItem => { 
+                            if(dataItem.Title === null) 
+                                return '<a href="' + dataItem.FileRef + '" title="Link to course for Microsoft Stream Video" target="_blank">Microsoft Stream Video</a>';
+                            else
+                                return '<a href="' + dataItem.FileRef + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>';
+                        }},
+                        { field: 'Topic', title: 'Topic', width: 150 },
+                        { field: 'PresentationSubTopic', title: 'Subtopic', width: 150, hidden: true },
+                        { field: 'Modified', title: 'Date', width: 150, template: '#= kendo.toString(Modified, "MMM d, yyyy") #' }
+                    ]
+                    /*
+                    dataBound: e => {
+                        this.wamGrid.tbody.find('tr.k-master-row').each((idx,elem) => {
+                            this.wamGrid.collapseRow(elem);
+                        });
+                    }*/
+                };
+                this.wamGrid = $('#grid4').kendoGrid(this.wamGridOptions).data('kendoGrid');    
+
+            }
         });
 
         return SPA.instance;

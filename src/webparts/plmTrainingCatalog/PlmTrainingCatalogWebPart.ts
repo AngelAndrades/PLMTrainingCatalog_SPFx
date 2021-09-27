@@ -73,7 +73,7 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                                 // SAFe tab
                                 `<div></div>` +
                                 // WAM tab
-                                `<div></div></div>` +
+                                `<div><div id="grid4"></div></div></div>` +
                                 `<div id="dialog"></div>`;
     
     const app = SPA.getInstance({
