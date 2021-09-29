@@ -20,6 +20,7 @@ export interface Params {
     safeLink: string;
     wamLink: string;
     enableMaturity: boolean;
+    enableExport: boolean;
 }
 
 export class SPA {
@@ -50,6 +51,16 @@ export class SPA {
 
     public static getInstance(args: Params): SPA {
         var appState = new ModelState();
+
+        // Toolbar configuration
+        let toolbar = [];
+        let readingToolbar = ['search'];
+        if (args.enableExport) {
+            toolbar.push('excel');
+            toolbar.push('pdf');
+            readingToolbar.push('excel');
+            readingToolbar.push('pdf');
+        }
 
         // Required for Excel Export to work with Grid
         window['JSZip'] = JSZip;
@@ -320,10 +331,11 @@ $(() => {
                     mode: 'single',
                     showIndexes: true
                 },
-                toolbar: [ 'excel', 'pdf' ],
+                toolbar: toolbar,
                 excel: {
                     fileName: 'DSO ByRole Training Export.xlsx',
-                    filterable: true
+                    filterable: true,
+                    allPages: true
                 },
                 pdf: {
                     fileName: 'DSO ByRole Training Export.pdf',
@@ -342,11 +354,17 @@ $(() => {
                     { field: 'TMSItemID', title: 'TMS Item ID', width: 175 },
                     { field: 'DSO_x0020_Maturity_x0020_Level', title: 'DSO Maturity Level', width: 225, hidden: true, template: dataItem => { if (dataItem.DSO_x0020_Maturity_x0020_Level != null) return dataItem.DSO_x0020_Maturity_x0020_Level.replaceAll(',', ', '); else return ''; } },
                     //{ field: 'PLM_x0020_Roadmap_x0020_Focus', title: 'Roadmap Focus', width: 225 },
-                    { field: 'Role_x0028_s_x0029_', title: 'Roles', hidden: true },
+                    { field: 'Role_x0028_s_x0029_', title: 'Roles', width: 200, hidden: true },
+                    { field: 'Link_x0020_to_x0020_Resource', title: 'Link', width: 500 },
                     { field: 'Keywords', title: 'Keywords', hidden: true, exportable: false }
-                ]
+                ],
+
+                excelExport: e => {
+                    this.catalogGrid.showColumn('Link_x0020_to_x0020_Resource');
+                }
             };
             this.catalogGrid = $('#grid').kendoGrid(this.catalogGridOptions).data('kendoGrid');
+            this.catalogGrid.hideColumn('Link_x0020_to_x0020_Resource');
             if(args.enableMaturity) this.catalogGrid.showColumn('DSO_x0020_Maturity_x0020_Level');
             this.catalogGrid.dataSource.filter([
                 { field: 'DevSecOps', operator: 'eq', value: false },
@@ -375,7 +393,7 @@ $(() => {
                     showIndexes: true
                 },
                 //toolbar: [ 'search' ],
-                toolbar: [ 'excel', 'pdf' ],
+                toolbar: toolbar,
                 excel: {
                     fileName: 'DevSecOps Training Export.xlsx',
                     filterable: true
@@ -425,7 +443,7 @@ $(() => {
                     mode: 'single',
                     showIndexes: true
                 },
-                toolbar: [ 'search', 'excel', 'pdf' ],
+                toolbar: readingToolbar,
                 excel: {
                     fileName: 'DevSecOps Recommended Reading Export.xlsx',
                     filterable: true

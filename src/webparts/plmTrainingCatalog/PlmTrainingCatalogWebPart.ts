@@ -29,6 +29,7 @@ export interface IPlmTrainingCatalogWebPartProps {
   lnkSafe: string;
   lnkWAM: string;
   enableMaturity: boolean;
+  enableExport: boolean;
 }
 
 export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPlmTrainingCatalogWebPartProps> {
@@ -82,7 +83,8 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
       maturityGuid: this.properties.maturityList,
       safeLink: this.properties.lnkSafe,
       wamLink: this.properties.lnkWAM,
-      enableMaturity: this.properties.enableMaturity
+      enableMaturity: this.properties.enableMaturity,
+      enableExport: this.properties.enableExport
     });
   }
 
@@ -156,8 +158,11 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                 PropertyPaneToggle('enableMaturity', {
                   label: 'Enable Maturity Level Filter',
                   checked: false
-                }
-                )
+                }),
+                PropertyPaneToggle('enableExport', {
+                  label: 'Enable Grid Export',
+                  checked: false
+                })
               ]
             }
           ]
