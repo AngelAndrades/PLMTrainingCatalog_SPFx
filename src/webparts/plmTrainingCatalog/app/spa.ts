@@ -56,9 +56,9 @@ export class SPA {
         let toolbar = [];
         let readingToolbar = ['search'];
         if (args.enableExport) {
-            toolbar.push('excel');
+            //toolbar.push('excel');
             toolbar.push('pdf');
-            readingToolbar.push('excel');
+            //readingToolbar.push('excel');
             readingToolbar.push('pdf');
         }
 
