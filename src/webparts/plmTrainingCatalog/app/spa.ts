@@ -192,8 +192,9 @@ $(() => {
                             ]
                         });
 
-                        // Always Disable the Role DropDownList
+                        // Always Disable and Reset the Role DropDownList
                         this.roleDropDownList.enable(false);
+                        this.roleDropDownList.setDataSource(role);
 
                         if (e.sender.value() === 'Product Team Level') {
                             // Filter duplicates
