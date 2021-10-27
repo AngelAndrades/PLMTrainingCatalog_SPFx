@@ -3,6 +3,7 @@ import * as JSZip from 'jszip';
 import '@progress/kendo-ui';
 import { ds, dsExpand } from  './datasource';
 import { sp, objectToSPKeyValueCollection } from '@pnp/sp/presets/all';
+import { data } from 'jquery';
 
 export class ModelState extends kendo.data.ObservableObject {
     constructor() {
@@ -486,15 +487,20 @@ $(() => {
                 const dsWAM = new kendo.data.DataSource({
                     transport: {
                         read: async options => {
-                            $.ajax({
-                                url: "https://dvagov.sharepoint.com/sites/OITACOEPortal/agilecoach/_api/web/Lists(guid'" + args.wamLink + "')/items?$select=Title,Topic,PresentationSubTopic,FileRef,Modified&$top=5000",
-                                method: 'GET',
-                                headers: {
-                                    'Accept':'application/json; odata=nometadata'
+                            // This library belongs to the Agile Coaching subsite, changing context for this call
+                            const isolatedSP = await sp.createIsolated();
+                            isolatedSP.setup({
+                                sp: {
+                                    baseUrl: 'https://dvagov.sharepoint.com/sites/OITACOEPortal/agilecoach'
                                 }
+                            });
+
+                            isolatedSP.web.lists.getById(args.wamLink).items.select('Title,Topic,DateofPresentation,FileRef').filter("Topic ne 'Archived' and Topic ne 'Recordings'").top(5000).getAll()
+                            .then(response => {
+                                options.success(response);
                             })
-                            .then(data => {
-                                options.success(data.value);
+                            .catch(err => {
+                                console.log('Error accessing Agile Coaching site: ', err);
                             });
                         }
                     },
@@ -503,18 +509,15 @@ $(() => {
                             fields: {
                                 Title: { type: 'string' },
                                 Topic: { type: 'string' },
-                                PresentationSubTopic: { type: 'string' },
-                                FileRef: {type: 'string' },
-                                Modified: { type: 'date' }
+                                DateofPresentation: { type: 'date' },
+                                FileRef: {type: 'string' }
                             }
                         }
                     },
                     pageSize: 10,
                     sort: [
-                        { field: 'Topic', dir: 'asc'},
-                        { field: 'Title', dir: 'asc' }
+                        { field: 'DateofPresentation', dir: 'desc'}
                     ]
-                    //group: { field: 'Topic', dir: 'asc'}
                 });
                 
                 this.wamGridOptions = {
@@ -543,13 +546,12 @@ $(() => {
                     columns: [
                         { field: 'Title', title: 'File Name', width: 250, template: dataItem => { 
                             if(dataItem.Title === null) 
-                                return '<a href="' + dataItem.FileRef + '" title="Link to course for Microsoft Stream Video" target="_blank">Microsoft Stream Video</a>';
+                                return '<a href="' + dataItem.FileRef + '" target="_blank">' + dataItem.FileRef.substring(dataItem.FileRef.lastIndexOf('/' + 1)) + '</a>';
                             else
                                 return '<a href="' + dataItem.FileRef + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>';
                         }},
                         { field: 'Topic', title: 'Topic', width: 150 },
-                        { field: 'PresentationSubTopic', title: 'Subtopic', width: 150, hidden: true },
-                        { field: 'Modified', title: 'Date', width: 150, template: '#= kendo.toString(Modified, "MMM d, yyyy") #' }
+                        { field: 'DateofPresentation', title: 'Date', width: 150, template: '#= kendo.toString(DateofPresentation, "MMM d, yyyy") #' }
                     ]
                     /*
                     dataBound: e => {
