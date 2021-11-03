@@ -541,7 +541,21 @@ $(() => {
                         mode: 'single',
                         showIndexes: true
                     },
-                    toolbar: [ 'search' ],
+                    toolbar: readingToolbar,
+                    excel: {
+                        fileName: 'Weekly Agile Meetings Export.xlsx',
+                        filterable: true
+                    },
+                    pdf: {
+                        fileName: 'Weekly Agile Meetings Export.pdf',
+                        allPages: true,
+                        avoidLinks: false,
+                        paperSize: 'letter',
+                        margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' },
+                        landscape: true,
+                        scale: 0.8
+                    },
+    
 
                     columns: [
                         { field: 'Title', title: 'File Name', width: 250, template: dataItem => { 
