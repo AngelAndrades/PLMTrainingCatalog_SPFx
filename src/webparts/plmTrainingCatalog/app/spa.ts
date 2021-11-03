@@ -551,7 +551,7 @@ $(() => {
                                 return '<a href="' + dataItem.FileRef + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>';
                         }},
                         { field: 'Topic', title: 'Topic', width: 150 },
-                        { field: 'DateofPresentation', title: 'Date', width: 150, template: '#= kendo.toString(DateofPresentation, "MMM d, yyyy") #' }
+                        { field: 'DateofPresentation', title: 'Date', width: 150, template: '#= kendo.toString(DateofPresentation.split("T")[0], "MMM d, yyyy") #' }
                     ]
                     /*
                     dataBound: e => {
