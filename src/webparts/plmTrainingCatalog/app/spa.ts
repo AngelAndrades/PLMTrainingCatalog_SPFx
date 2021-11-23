@@ -346,7 +346,7 @@ $(() => {
                     paperSize: 'letter',
                     margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' },
                     landscape: true,
-                    scale: 0.8
+                    scale: 0.5
                 },
                 columns: [
                     { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
@@ -407,7 +407,7 @@ $(() => {
                     paperSize: 'letter',
                     margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' },
                     landscape: true,
-                    scale: 0.8
+                    scale: 0.5
                 },
                 columns: [
                     { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { if (dataItem.Link_x0020_to_x0020_Resource != '') return '<a href="' + dataItem.Link_x0020_to_x0020_Resource + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; return dataItem.Title; } },
@@ -457,7 +457,7 @@ $(() => {
                     paperSize: 'letter',
                     margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' },
                     landscape: true,
-                    scale: 0.8
+                    scale: 0.5
                 },
                 
                 columns: [
@@ -553,7 +553,7 @@ $(() => {
                         paperSize: 'letter',
                         margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' },
                         landscape: true,
-                        scale: 0.8
+                        scale: 0.5
                     },
     
 
