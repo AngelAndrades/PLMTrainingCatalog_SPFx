@@ -26,7 +26,7 @@ export interface IPlmTrainingCatalogWebPartProps {
   catalogList: string;
   rolesList: string;
   maturityList: string;
-  lnkSafe: string;
+  safeList: string;
   lnkWAM: string;
   enableMaturity: boolean;
   enableExport: boolean;
@@ -47,7 +47,7 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
   }
 
   public render(): void {
-    this.domElement.innerHTML = `<style>.k-tabstrip>.k-tabstrip-items>.k-item { text-transform: none; }</style>` +
+    this.domElement.innerHTML = `<style>.k-tabstrip>.k-tabstrip-items>.k-item { text-transform: none; border-bottom-width: 5px; } .k-tabstrip-items>.k-state-active { border-bottom-color: #000000; }</style>` +
                                 `<div id="tabstrip"><ul><li class="k-state-active">By Role</li><li>DevSecOps</li><li>Recommended Reading</li><li>SAFe</li><li>Weekly Agile Meetings</li></ul>` +
                                 // Roles tab
                                 `<div><br /><div id="filters" style="margin: auto; padding: 1em; border: 1px solid lightgrey">` +
@@ -72,7 +72,7 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                                 // Recommended Reading tab
                                 `<div><div id="grid3"></div></div>` + 
                                 // SAFe tab
-                                `<div></div>` +
+                                `<div><div id="grid5"></div></div>` +
                                 // WAM tab
                                 `<div><div id="grid4"></div></div></div>` +
                                 `<div id="dialog"></div>`;
@@ -81,7 +81,7 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
       catalogGuid: this.properties.catalogList,
       rolesGuid: this.properties.rolesList,
       maturityGuid: this.properties.maturityList,
-      safeLink: this.properties.lnkSafe,
+      safeGuid: this.properties.safeList,
       wamLink: this.properties.lnkWAM,
       enableMaturity: this.properties.enableMaturity,
       enableExport: this.properties.enableExport
@@ -148,8 +148,18 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
                   key: 'listPickerFieldId'
                 }),
                 PropertyPaneHorizontalRule(),
-                PropertyPaneTextField('lnkSafe', {
-                  label: 'Paste the SAFe web page URL'
+                PropertyFieldListPicker('safeList', {
+                  label: 'Select the safe list',
+                  selectedList: this.properties.safeList,
+                  includeHidden: false,
+                  orderBy: PropertyFieldListPickerOrderBy.Title,
+                  disabled: false,
+                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
+                  properties: this.properties,
+                  context: this.context,
+                  onGetErrorMessage: null,
+                  deferredValidationTime: 0,
+                  key: 'listPickerFieldId'
                 }),
                 PropertyPaneHorizontalRule(),
                 PropertyPaneTextField('lnkWAM', {

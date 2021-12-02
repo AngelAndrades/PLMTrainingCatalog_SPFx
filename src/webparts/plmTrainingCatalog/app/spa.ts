@@ -18,7 +18,7 @@ export interface Params {
     catalogGuid: string;
     rolesGuid: string;
     maturityGuid: string;
-    safeLink: string;
+    safeGuid: string;
     wamLink: string;
     enableMaturity: boolean;
     enableExport: boolean;
@@ -46,6 +46,8 @@ export class SPA {
     protected static tabStripOptions: kendo.ui.TabStripOptions;
     protected static dialog: kendo.ui.Dialog;
     protected static dialogOptions: kendo.ui.DialogOptions;
+    protected static safeGridOptions: kendo.ui.GridOptions;
+    protected static safeGrid: kendo.ui.Grid;
     private static instance: SPA;
 
     constructor() {}
@@ -90,8 +92,7 @@ export class SPA {
             pageSize: 5,
             sort: { field: 'Title', dir: 'asc' },
             expand: ['Role_x0028_s_x0029_','Asset_x0020_Type','PLM_x0020_Roadmap_x0020_Focus'],
-            expandedFields: ['Role_x0028_s_x0029_/Subrole','Asset_x0020_Type/Title','PLM_x0020_Roadmap_x0020_Focus/Title'],
-            //filter: { field: 'DevSecOps', operator: 'equals', value: 0 }
+            expandedFields: ['Role_x0028_s_x0029_/Subrole','Asset_x0020_Type/Title','PLM_x0020_Roadmap_x0020_Focus/Title']
         });
 
         const dsMaturityDataSource = ds({
@@ -106,6 +107,27 @@ export class SPA {
             },
             sort: {field: 'Id', dir: 'asc'}
         });
+
+        const dsSafe = dsExpand({
+            guid: args.safeGuid,
+            dsName: 'dsSafe',
+            schema: {
+                id: 'Id',
+                fields: {
+                    Id: { type: 'number' },
+                    Title: { type: 'string' },
+                    TrainingLink: { type: 'object' },
+                    Certification: { type: 'string' },
+                    CourseLevel: { type: 'string' },
+                    LearningHours: { type: 'number' },
+                    Roles: { type: 'object' }
+                }
+            },
+            sort: { field: 'Title', dir: 'asc' },
+            expand: ['Roles'],
+            expandedFields: ['Roles/Title']
+        });
+        //dsSafe.read().then(res => console.log(res));
 
 $(() => {
             this.tabStripOptions = {
@@ -133,9 +155,11 @@ $(() => {
                         case 'Recommended Reading':
                             this.readingGrid.dataSource.filter({ field: 'Recommended_x0020_Reading', operator: 'eq', value: true });
                             break;
+                        case 'SAFe':
+                            break;
                         default:
                             appState.tabName = e.item.textContent;
-                            appState.redirectUrl = (e.item.textContent == 'SAFe' ? args.safeLink : args.wamLink);
+                            appState.redirectUrl = (e.item.textContent == 'SAFe' ? args.safeGuid : args.wamLink);
 
                             if (appState.redirectUrl.startsWith('http'))
                             {
@@ -562,7 +586,7 @@ $(() => {
                             if(dataItem.Title === null) 
                                 return '<a href="' + dataItem.FileRef + '" target="_blank">' + dataItem.FileRef.substring(dataItem.FileRef.lastIndexOf('/' + 1)) + '</a>';
                             else
-                                return '<a href="' + dataItem.FileRef + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>';
+                                return '<a href="' + dataItem.FileRef + '" title="Link to presentation for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>';
                         }},
                         { field: 'Topic', title: 'Topic', width: 150 },
                         { field: 'DateofPresentation', title: 'Date', width: 150, template: '#= new Date(DateofPresentation.getTime() + DateofPresentation.getTimezoneOffset()*60000).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric" }) #' }
@@ -577,6 +601,48 @@ $(() => {
                 this.wamGrid = $('#grid4').kendoGrid(this.wamGridOptions).data('kendoGrid');    
 
             }
+
+            this.safeGridOptions = {
+                dataSource: dsSafe,
+                columnMenu: true,
+                editable: false,
+                filterable: true,
+                groupable: false,
+                navigatable: true,
+                pageable: false,
+                reorderable: true,
+                resizable: true,
+                scrollable: { virtual: 'column' },
+                sortable: {
+                    allowUnsort: false,
+                    initialDirection: 'asc',
+                    mode: 'single',
+                    showIndexes: true
+                },
+                toolbar: readingToolbar,
+                excel: {
+                    fileName: 'SAFe Training Export.xlsx',
+                    filterable: true
+                },
+                pdf: {
+                    fileName: 'SAFe Training Export.pdf',
+                    allPages: true,
+                    avoidLinks: false,
+                    paperSize: 'letter',
+                    margin: { top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' },
+                    landscape: true,
+                    scale: 0.5
+                },
+                
+                columns: [
+                    { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { return '<a href="' + dataItem.TrainingLink.Url + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; } },
+                    { field: 'Certification', title: 'Certification', width: 150 },
+                    { field: 'CourseLevel', title: 'Course Level', width: 200 },
+                    { field: 'LearningHours', title: 'Learning Hours', width: 150 },
+                    { field: 'Roles', title: 'Roles', width: 250, template: dataItem => { return dataItem.Roles.map(item => item.Title).join(', '); } },
+                ]
+            };
+            this.safeGrid = $('#grid5').kendoGrid(this.safeGridOptions).data('kendoGrid');
         });
 
         return SPA.instance;
