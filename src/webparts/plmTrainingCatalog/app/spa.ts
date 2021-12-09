@@ -119,7 +119,7 @@ export class SPA {
                     TrainingLink: { type: 'object' },
                     Certification: { type: 'string' },
                     CourseLevel: { type: 'string' },
-                    LearningHours: { type: 'number' },
+                    LearningHours: { type: 'string' },
                     Roles: { type: 'object' }
                 }
             },
@@ -638,7 +638,7 @@ $(() => {
                     { field: 'Title', title: 'Course Name', width: 350, template: dataItem => { return '<a href="' + dataItem.TrainingLink.Url + '" title="Link to course for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>'; } },
                     { field: 'Certification', title: 'Certification', width: 150 },
                     { field: 'CourseLevel', title: 'Course Level', width: 200 },
-                    { field: 'LearningHours', title: 'Learning Hours', width: 150 },
+                    { field: 'LearningHours', title: 'Learning Hours', width: 200 },
                     { field: 'Roles', title: 'Roles', width: 250, template: dataItem => { return dataItem.Roles.map(item => item.Title).join(', '); } },
                 ]
             };
