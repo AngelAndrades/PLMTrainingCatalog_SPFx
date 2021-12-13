@@ -47,7 +47,7 @@ export default class PlmTrainingCatalogWebPart extends BaseClientSideWebPart<IPl
   }
 
   public render(): void {
-    this.domElement.innerHTML = `<style>.k-tabstrip>.k-tabstrip-items>.k-item { text-transform: none; border-bottom-width: 5px; } .k-tabstrip-items>.k-state-active { border-bottom-color: #000000; }</style>` +
+  this.domElement.innerHTML = `<style>.k-tabstrip>.k-tabstrip-items>.k-item { text-transform: none; border-bottom-width: 10px; } /*.k-tabstrip-items>.k-state-active { border-bottom-color: #000000;*/ }</style>` +
                                 `<div id="tabstrip"><ul><li class="k-state-active">By Role</li><li>DevSecOps</li><li>Recommended Reading</li><li>SAFe</li><li>Weekly Agile Meetings</li></ul>` +
                                 // Roles tab
                                 `<div><br /><div id="filters" style="margin: auto; padding: 1em; border: 1px solid lightgrey">` +
