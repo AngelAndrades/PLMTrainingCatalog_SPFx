@@ -233,7 +233,7 @@ $(() => {
                             this.teamDropDownList.setDataSource(dsFilterSharedDataSource);
                         }
 
-                        if (e.sender.value() === 'Account Manager' || e.sender.value() === 'Business Owner') {
+                        if (e.sender.value() === 'Account Manager' || e.sender.value() === 'Business Owner' || e.sender.value() === 'Product Owners' ) {
                             this.teamDropDownList.enable(false);
 
                             // Update grid filter for these values
