@@ -519,7 +519,7 @@ $(() => {
                                 }
                             });
 
-                            isolatedSP.web.lists.getById(args.wamLink).items.select('Title,Topic,DateofPresentation,FileRef').filter("Topic ne 'Archived' and Topic ne 'Recordings'").top(5000).getAll()
+                            isolatedSP.web.lists.getById(args.wamLink).items.select('Title,Topic,DateofPresentation,FileRef,Recording').filter("Topic ne 'Archived' and Topic ne 'Recordings'").top(5000).getAll()
                             .then(response => {
                                 options.success(response);
                             })
@@ -534,7 +534,8 @@ $(() => {
                                 Title: { type: 'string' },
                                 Topic: { type: 'string' },
                                 DateofPresentation: { type: 'date' },
-                                FileRef: {type: 'string' }
+                                FileRef: {type: 'string' },
+                                Recording: { type: 'Object' }
                             }
                         }
                     },
@@ -589,7 +590,8 @@ $(() => {
                                 return '<a href="' + dataItem.FileRef + '" title="Link to presentation for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>';
                         }},
                         { field: 'Topic', title: 'Topic', width: 150 },
-                        { field: 'DateofPresentation', title: 'Date', width: 150, template: '#= new Date(DateofPresentation.getTime() + DateofPresentation.getTimezoneOffset()*60000).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric" }) #' }
+                        { field: 'DateofPresentation', title: 'Date', width: 150, template: '#= new Date(DateofPresentation.getTime() + DateofPresentation.getTimezoneOffset()*60000).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric" }) #' },
+                        { field: 'Recording', template: (dataItem: any) => { if (dataItem.Recording !== null) return '<a href="' + dataItem.Recording.Url + '" title="link to ' + dataItem.Recording.Description + ' video stream" target="_blank">Video Stream</a>'; else return 'N/A'; } }
                     ]
                     /*
                     dataBound: e => {
