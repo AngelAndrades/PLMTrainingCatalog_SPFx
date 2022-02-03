@@ -583,13 +583,13 @@ $(() => {
     
 
                     columns: [
-                        { field: 'Title', title: 'File Name', width: 250, template: dataItem => { 
+                        { field: 'Title', title: 'File Name', width: 350, template: dataItem => { 
                             if(dataItem.Title === null) 
                                 return '<a href="' + dataItem.FileRef + '" target="_blank">' + dataItem.FileRef.substring(dataItem.FileRef.lastIndexOf('/' + 1)) + '</a>';
                             else
                                 return '<a href="' + dataItem.FileRef + '" title="Link to presentation for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>';
                         }},
-                        { field: 'Topic', title: 'Topic', width: 150 },
+                        { field: 'Topic', title: 'Topic', width: 250 },
                         { field: 'DateofPresentation', title: 'Date', width: 150, template: '#= new Date(DateofPresentation.getTime() + DateofPresentation.getTimezoneOffset()*60000).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric" }) #' },
                         { field: 'Recording', template: (dataItem: any) => { if (dataItem.Recording !== null) return '<a href="' + dataItem.Recording.Url + '" title="link to ' + dataItem.Recording.Description + ' video stream" target="_blank">Video Stream</a>'; else return 'N/A'; } }
                     ]
