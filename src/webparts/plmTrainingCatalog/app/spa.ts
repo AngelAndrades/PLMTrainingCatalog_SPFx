@@ -589,9 +589,9 @@ $(() => {
                             else
                                 return '<a href="' + dataItem.FileRef + '" title="Link to presentation for ' + dataItem.Title + '" target="_blank">' + dataItem.Title + '</a>';
                         }},
+                        { field: 'Recording', template: (dataItem: any) => { if (dataItem.Recording !== null) return '<a href="' + dataItem.Recording.Url + '" title="link to ' + dataItem.Recording.Description + ' video stream" target="_blank">Video Stream</a>'; else return 'N/A'; } },
                         { field: 'Topic', title: 'Topic', width: 350 },
-                        { field: 'DateofPresentation', title: 'Date', width: 150, template: '#= new Date(DateofPresentation.getTime() + DateofPresentation.getTimezoneOffset()*60000).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric" }) #' },
-                        { field: 'Recording', template: (dataItem: any) => { if (dataItem.Recording !== null) return '<a href="' + dataItem.Recording.Url + '" title="link to ' + dataItem.Recording.Description + ' video stream" target="_blank">Video Stream</a>'; else return 'N/A'; } }
+                        { field: 'DateofPresentation', title: 'Date', width: 150, template: '#= new Date(DateofPresentation.getTime() + DateofPresentation.getTimezoneOffset()*60000).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric" }) #' }
                     ]
                     /*
                     dataBound: e => {
