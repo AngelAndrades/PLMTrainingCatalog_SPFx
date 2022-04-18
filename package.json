@@ -1,6 +1,6 @@
 {
   "name": "plm-training-catalog",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "private": true,
   "main": "lib/index.js",
   "engines": {
